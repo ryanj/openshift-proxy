@@ -1,0 +1,4 @@
+A reverse proxy to direct traffic to pods using an Oauth token secured API
+
+* npm install
+* npm start
