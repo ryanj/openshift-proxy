@@ -11,7 +11,7 @@ var token = process.env.ACCESS_TOKEN || '';
 
 var config = {
   openshiftServer: 'https://openshift-master.summit2.paas.ninja:8443'
-  ,openshiftServer2: 'http://google.ca'
+, port: $OPENSHIFT_NODEJS_IP || 5050
 };
 
 var re = /^\/([a-z0-9\-]*)\/([a-z0-9\-]*)/;
@@ -30,5 +30,5 @@ var server = http.createServer(function(req, res) {
   proxy.web(req, res, { target: config.openshiftServer });
 });
 
-console.log("listening on port 5050")
-server.listen(5050);
+console.log('listening on port', config.port)
+server.listen(config.port);
