@@ -1,4 +1,12 @@
-A reverse proxy to direct traffic to pods using an Oauth token secured API
+A reverse proxy to direct traffic to pods using an Oauth token secured API.
+
+The Oauth Token is specified as an environment variable.  It can be set on startup.
 
 * npm install
-* npm start
+* ACCESS_TOKEN=123456789 npm start
+
+HTTP requests to pods should be of the form:
+
+----
+http://1k.jbosskeynote.com/{namespace}/{pod_name}
+----

@@ -25,7 +25,13 @@ var server = http.createServer(function(req, res) {
       var apiUrl = '/api/v1beta3/namespaces/' + results[1] + '/pods/'+ results[2] +'/proxy/';
       var oldUrl = req.url.substring(results[0].length)
       req.url = apiUrl + oldUrl;
-    };
+    } else {
+      res.writeHead(400, { 'Content-Type': 'text/html' });
+      res.write('<html><body><h3>Invalid url.</h3><p>Specify a correct namespace and pod name in the URL as in:</p>');
+      res.write('<p>http://1k.jbosskeynote.com/{namespace}/{pod_name}</p>');
+      res.end();
+      return;
+    }
   };
 
   req.headers.authorization = 'Bearer ' + token;
