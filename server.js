@@ -26,7 +26,7 @@ var server = http.createServer(function(req, res) {
       var oldUrl = req.url.substring(results[0].length)
       req.url = apiUrl + oldUrl;
     } else {
-      res.writeHead(400, { 'Content-Type': 'text/html' });
+      res.writeHead(200, { 'Content-Type': 'text/html' });
       res.write('<html><body><h3>Invalid url.</h3><p>Specify a correct namespace and pod name in the URL as in:</p>');
       res.write('<p>http://1k.jbosskeynote.com/{namespace}/{pod_name}</p>');
       res.end();
