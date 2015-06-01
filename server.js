@@ -39,5 +39,5 @@ var server = http.createServer(function(req, res) {
   proxy.web(req, res, { target: config.openshiftServer });
 });
 
-console.log('listening on port', config.port)
+console.log('listening on', config.hostname, ':', config.port)
 server.listen(config.port, config.hostname);
