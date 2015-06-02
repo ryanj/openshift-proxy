@@ -22,7 +22,7 @@ var server = http.createServer(function(req, res) {
     var parsed = url.parse(req.url);
     var results = parsed.pathname.match(re);
     if (results) {
-      var apiUrl = '/api/v1beta3/namespaces/' + results[1] + '/pods/'+ results[2] +'/proxy/';
+      var apiUrl = '/api/v1beta3/namespaces/' + results[1] + '/pods/'+ results[2] +'/proxy';
       var oldUrl = req.url.substring(results[0].length)
       req.url = apiUrl + oldUrl;
     } else {
