@@ -10,7 +10,7 @@ var proxy = httpProxy.createProxyServer({secure: false});
 var token = process.env.ACCESS_TOKEN || '';
 
 var config = {
-  openshiftServer: process.env.OPENSHIFT_SERVER || 'https://openshift-master.summit.paas.ninja:8443'
+  openshiftServer: 'https://' + (process.env.OPENSHIFT_SERVER || 'openshift-master.summit.paas.ninja:8443')
 , port: process.env.OPENSHIFT_NODEJS_PORT || 5050
 , hostname: process.env.OPENSHIFT_NODEJS_IP || 'localhost'
 };
