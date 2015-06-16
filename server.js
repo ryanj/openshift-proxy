@@ -5,6 +5,8 @@ var http = require('http')
   , url = require('url')
   ;
 
+http.globalAgent.maxSockets = Infinity;
+
 var proxy = httpProxy.createProxyServer({secure: false});
 
 var token = process.env.ACCESS_TOKEN || '';
