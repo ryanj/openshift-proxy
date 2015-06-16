@@ -9,6 +9,15 @@ http.globalAgent.maxSockets = Infinity;
 
 var proxy = httpProxy.createProxyServer({secure: false});
 
+proxy.on('error', function (error, req, res) {
+  console.log('proxy error', error);
+  if (!res.headersSent) {
+    res.writeHead(500, { 'content-type': 'application/json' });
+  }
+  var json = { error: 'proxy_error', reason: error.message };
+  res.end(JSON.stringify(json));
+});
+
 var token = process.env.ACCESS_TOKEN || '';
 
 var config = {
