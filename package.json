@@ -15,6 +15,7 @@
   "dependencies": {
     "http-proxy": "^1.11.1",
     "restify": "~3.0.2",
-    "lru-cache": "~2.6.2"
+    "lru-cache": "~2.6.2",
+    "redbird": "~0.2.3"
   }
 }

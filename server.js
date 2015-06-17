@@ -7,16 +7,20 @@ var http = require('http')
   , url = require('url')
   ;
 
+http.globalAgent.maxSockets = Infinity;
+
+
+var proxy = httpProxy.createProxyServer({secure: false});
+var revProxy = require('redbird')({port: 8081});
+var revProxyUrl = "http://localhost:8081";
+
 var LRU = require("lru-cache")
   , options = { max: 1050
               , length: function (n) { return n.length }
+	      , dispose: function (key, n) { revProxy.unregister(key, n) }
               , maxAge: 1000 }
   , podCache = LRU(options)
   ;
-
-http.globalAgent.maxSockets = Infinity;
-
-var proxy = httpProxy.createProxyServer({secure: false});
 
 proxy.on('error', function (error, req, res) {
   console.log('proxy error', error);
@@ -27,12 +31,11 @@ proxy.on('error', function (error, req, res) {
   res.end(JSON.stringify(json));
 });
 
-var token = process.env.ACCESS_TOKEN || '';
-
 var config = {
   openshiftServer: 'https://' + (process.env.OPENSHIFT_SERVER || 'openshift-master.summit.paas.ninja:8443')
 , port: process.env.OPENSHIFT_NODEJS_PORT || 8080
 , hostname: process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
+, token = process.env.ACCESS_TOKEN || '';
 };
 
 var re = /^\/([a-z0-9\-]*)\/([a-z0-9\-]*)/;
@@ -64,7 +67,7 @@ var server = http.createServer(function(req, res) {
           url: config.openshiftServer,
           rejectUnauthorized: false,
           headers: {
-            authorization: "Bearer " + token
+            authorization: "Bearer " + config.token
           }
         });
         var podPath = "/api/v1beta3/namespaces/" + namespace + "/pods/" + pod;
@@ -76,7 +79,7 @@ var server = http.createServer(function(req, res) {
             console.log("Failing back to kube proxy");
             var apiPath = podPath +'/proxy';
             req.url = apiPath + origPath;
-  	    req.headers.authorization = 'Bearer ' + token;
+  	    req.headers.authorization = 'Bearer ' + config.token;
             console.log(req.url);
             proxy_request(proxy, req, res, { target: config.openshiftServer });
           } else {
@@ -85,16 +88,13 @@ var server = http.createServer(function(req, res) {
             var containerUrl = "http://" + podIp + ":" + containerPort;
             console.log("Caching value: " + containerUrl + " for: " + cacheKey);
             podCache.set(cacheKey, containerUrl);
-	    req.url = newPath;
-            console.log(req.url);
-	    proxy_request(proxy, req, res, { target: containerUrl });
+	    revProxy.register(cacheKey, containerUrl);
+	    proxy_request(proxy, req, res, { target: revProxyUrl });
           }
         });
       } else {
         console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
-	req.url = newPath;
-        console.log(req.url);
-	proxy_request(proxy, req, res, { target: containerUrl });
+	proxy_request(proxy, req, res, { target: revProxyUrl });
       }
 
     } else {
