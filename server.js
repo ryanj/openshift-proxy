@@ -44,11 +44,16 @@ function proxy_request(proxy, req, res, options){
 var server = http.createServer(function(req, res) {
   if (req.url.indexOf('/api/v1beta3/namespaces/') !== 0) {
     var parsed = url.parse(req.url);
+    console.log("parsed: ", parsed)
     var results = parsed.pathname.match(re);
     var origPath = req.url.substring(results[0].length);
+    console.log("origPath: ", origPath)
     var namespace = results[1];
+    console.log("namespace: ", namespace)
     var pod = results[2];
+    console.log("pod: ", pod)
     var newPath = results.slice(3).join('/')
+    console.log("newPath: ", newPath)
     if (results) {
 
       var cacheKey = namespace + "/" + pod;
@@ -63,6 +68,7 @@ var server = http.createServer(function(req, res) {
         });
         var podPath = "/api/v1beta3/namespaces/" + namespace + "/pods/" + pod;
 	var podUrl = config.openshiftServer + podPath
+        console.log("podUrl: ", podUrl)
         client.get(podUrl, function(err, c_req, c_res, obj) {
 	  console.log
           if (err instanceof Error) {
