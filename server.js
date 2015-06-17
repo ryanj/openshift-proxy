@@ -53,6 +53,9 @@ var server = http.createServer(function(req, res) {
     var pod = results[2];
     console.log("pod: ", pod)
     var newPath = results.slice(3).join('/')
+    if (newPath == ''){
+      newPath = "/";
+    }
     console.log("newPath: ", newPath)
     if (results) {
 
