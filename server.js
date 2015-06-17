@@ -45,10 +45,13 @@ var server = http.createServer(function(req, res) {
   if (req.url.indexOf('/api/v1beta3/namespaces/') !== 0) {
     var parsed = url.parse(req.url);
     var results = parsed.pathname.match(re);
+    var origPath = req.url.substring(results[0].length);
+    var namespace = results[1];
+    var pod = results[2];
+    var newPath = results.slice(3).join('/')
     if (results) {
 
-      var oldUrl = req.url.substring(results[0].length);
-      var cacheKey = results[1] + "/" + results[2];
+      var cacheKey = namespace + "/" + pod;
       var containerUrl = cache.get(cacheKey);
       if (!containerUrl) {
         var client = restify.createJsonClient({
@@ -58,15 +61,15 @@ var server = http.createServer(function(req, res) {
             authorization: "Bearer " + token
           }
         });
-        var podPath = "/api/v1beta3/namespaces/" + results[1] + "/pods/" + results[2];
+        var podPath = "/api/v1beta3/namespaces/" + namespace + "/pods/" + pod;
 	var podUrl = config.openshiftServer + podPath
         client.get(podUrl, function(err, c_req, c_res, obj) {
 	  console.log
           if (err instanceof Error) {
             console.log("Error querying api: ", err)
             console.log("Failing back to kube proxy");
-            var apiUrl = podPath +'/proxy';
-            req.url = apiUrl + oldUrl;
+            var apiPath = podPath +'/proxy';
+            req.url = apiPath + origPath;
   	    req.headers.authorization = 'Bearer ' + token;
             console.log(req.url);
             proxy_request(proxy, req, res, { target: config.openshiftServer });
@@ -76,14 +79,14 @@ var server = http.createServer(function(req, res) {
             var containerUrl = "http://" + podIp + ":" + containerPort;
             console.log("Caching value: " + containerUrl + " for: " + cacheKey);
             cache.set(cacheKey, containerUrl);
-	    req.url = oldUrl;
+	    req.url = newPath;
             console.log(req.url);
 	    proxy_request(proxy, req, res, { target: containerUrl });
           }
         });
       } else {
         console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
-	req.url = oldUrl;
+	req.url = newPath;
         console.log(req.url);
 	proxy_request(proxy, req, res, { target: containerUrl });
       }
