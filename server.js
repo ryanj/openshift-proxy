@@ -60,7 +60,7 @@ var server = http.createServer(function(req, res) {
     var newPath = results.slice(3).join('/')
     console.log("newPath: ", newPath)
     if (results) {
-      var cacheKey = namespace + "/" + pod;
+      var cacheKey = "/" + namespace + "/" + pod;
       var containerUrl = podCache.get(cacheKey);
       if (!containerUrl) {
         var client = restify.createJsonClient({
