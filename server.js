@@ -8,7 +8,7 @@ var http = require('http')
   ;
 
 var LRU = require("lru-cache")
-  , options = { max: 1026
+  , options = { max: 1050
               , length: function (n) { return n.length }
               , maxAge: 1000 }
   , podCache = LRU(options)
@@ -77,7 +77,7 @@ var server = http.createServer(function(req, res) {
           console.log(req.url);
 	  proxy_request(proxy, req, res, { target: serviceUrl });
         }
-      }
+      });
     } else {
       console.log("Using cached value: " + serviceUrl + " for: " + config.appService);
       req.url = newPath;
