@@ -35,7 +35,7 @@ var config = {
   openshiftServer: 'https://' + (process.env.OPENSHIFT_SERVER || 'openshift-master.summit.paas.ninja:8443')
 , port: process.env.OPENSHIFT_NODEJS_PORT || 8080
 , hostname: process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
-, token: process.env.ACCESS_TOKEN || '';
+, token: process.env.ACCESS_TOKEN || ''
 };
 
 var re = /^\/([a-z0-9\-]*)\/([a-z0-9\-]*)/;
