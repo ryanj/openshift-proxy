@@ -60,7 +60,7 @@ var server = http.createServer(function(req, res) {
     if (!serviceUrl) {
       var servicesPath = "/api/v1beta3/namespaces/" + config.appNamespace + "/services/" + config.appService;
       var servicesUrl = config.openshiftServer + servicesPath
-      client.get(, function(err, c_req, c_res, obj) {
+      client.get(servicesUrl, function(err, c_req, c_res, obj) {
         if (err instanceof Error) {
           console.log("Error querying api: ", err)
           if (!res.headersSent) {
