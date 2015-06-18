@@ -17,8 +17,8 @@ var revProxyUrl = "http://localhost:8081";
 var LRU = require("lru-cache")
   , options = { max: 1050
               , length: function (n) { return n.length }
-	      , dispose: function (key, n) { revProxy.unregister(key, n) }
-              , maxAge: 1000 }
+	      , dispose: function (key, n) { revProxy.unregister(key) }
+              , maxAge: 60000 }
   , podCache = LRU(options)
   ;
 
