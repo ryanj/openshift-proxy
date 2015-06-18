@@ -14,8 +14,10 @@
   "license": "ISC",
   "dependencies": {
     "http-proxy": "^1.11.1",
-    "restify": "~3.0.2",
-    "lru-cache": "~2.6.2",
-    "redbird": "~0.2.3"
+    "request": "^2.58.0",
+    "rx": "^2.5.3",
+    "rx-node": "^1.0.1",
+    "split": "^1.0.0",
+    "underscore": "^1.8.3"
   }
 }
