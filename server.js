@@ -40,14 +40,11 @@ var LRU = require("lru-cache")
 
   var re = /^\/([a-z0-9\-]*)\/([a-z0-9\-]*)/;
 
-  function proxy_request(proxy, req, res, options){
-    proxy.web(req, res, options);
-  }
-
   var server = http.createServer(function(req, res) {
     if (req.url.indexOf('/api/v1beta3/namespaces/') == 0) {
       proxy_request(proxy, req, res, { target: config.openshiftServer });
     } else {
+      console.log("*******************************************************************************");
       console.log("headers: ", req.headers)
       var parsed = url.parse(req.url);
       console.log("parsed: ", parsed)
@@ -92,7 +89,7 @@ var LRU = require("lru-cache")
               podCache.set(cacheKey, containerUrl);
               //revProxy.register(cacheKey, containerUrl);
               //proxy_request(proxy, req, res, { target: revProxyUrl });
-              proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: true });
+              proxy_request(proxy, req, res, { target: containerUrl + newPath + '/', prependPath: true, ignorePath: true });
             }
           });
         } else {
