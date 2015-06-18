@@ -11,13 +11,13 @@ http.globalAgent.maxSockets = Infinity;
 
 
 var proxy = httpProxy.createProxyServer({secure: false});
-var revProxy = require('redbird')({port: 8081});
-var revProxyUrl = "http://localhost:8081";
+//var revProxy = require('redbird')({port: 8081});
+//var revProxyUrl = "http://localhost:8081";
 
 var LRU = require("lru-cache")
   , options = { max: 1050
               , length: function (n) { return n.length }
-	      , dispose: function (key, n) { revProxy.unregister(key) }
+	      //, dispose: function (key, n) { revProxy.unregister(key) }
               , maxAge: 60000 }
   , podCache = LRU(options)
   ;
@@ -61,10 +61,8 @@ var server = http.createServer(function(req, res) {
     var newPath = results.slice(3).join('/')
     console.log("newPath: ", newPath)
     if (results) {
-      var cacheKey = "http://" + req.headers.host + "/" + namespace + "/" + pod;
-      if ( newPath == "" ){
-        req.url += '/index.hml'
-      }
+      //var cacheKey = "http://" + req.headers.host + "/" + namespace + "/" + pod;
+      var cacheKey = namespace + "/" + pod;
       var containerUrl = podCache.get(cacheKey);
       if (!containerUrl) {
         var client = restify.createJsonClient({
@@ -92,13 +90,15 @@ var server = http.createServer(function(req, res) {
             var containerUrl = "http://" + podIp + ":" + containerPort;
             console.log("Caching value: " + containerUrl + " for: " + cacheKey);
             podCache.set(cacheKey, containerUrl);
-	    revProxy.register(cacheKey, containerUrl);
-	    proxy_request(proxy, req, res, { target: revProxyUrl });
+	    //revProxy.register(cacheKey, containerUrl);
+	    //proxy_request(proxy, req, res, { target: revProxyUrl });
+	    proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: false });
           }
         });
       } else {
         console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
-	proxy_request(proxy, req, res, { target: revProxyUrl });
+	//proxy_request(proxy, req, res, { target: revProxyUrl });
+	proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: false });
       }
 
     } else {
