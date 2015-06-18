@@ -59,7 +59,7 @@ var LRU = require("lru-cache")
     console.log("req.url", req.url);
     if (req.url.indexOf('/'+config.namespace) !== 0) {
       containerUrl = podCache.get('test3/sketchpod-1-k8wj0');
-      proxy_request(proxy, req, res, { target: containerUrl, prependPath: true, ignorePath: true });
+      proxy_request(proxy, req, res, { target: containerUrl });
     } else {
       var parsed = url.parse(req.url);
       var results = parsed.pathname.match(re);
@@ -83,7 +83,7 @@ var LRU = require("lru-cache")
         if (!!containerUrl) {
           console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
           //proxy_request(proxy, req, res, { target: revProxyUrl });
-          proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: true });
+          proxy_request(proxy, req, res, { target: containerUrl });
         } else {
           var client = restify.createJsonClient({
             url: config.openshiftServer,
@@ -106,7 +106,7 @@ var LRU = require("lru-cache")
               podCache.set(cacheKey, containerUrl);
               //revProxy.register(cacheKey, containerUrl);
               //proxy_request(proxy, req, res, { target: revProxyUrl });
-              proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: true });
+              proxy_request(proxy, req, res, { target: containerUrl });
             }
           });
         }
