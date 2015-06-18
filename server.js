@@ -107,7 +107,7 @@ var LRU = require("lru-cache")
         } else {
           console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
           //proxy_request(proxy, req, res, { target: revProxyUrl });
-          proxy_request(proxy, req, res, { target: containerUrl + newPath + '/', prependPath: true, ignorePath: true });
+          proxy_request(proxy, req, res, { target: containerUrl + newPath + '/', prependPath: true, ignorePath: false });
         }
 
       } else {
