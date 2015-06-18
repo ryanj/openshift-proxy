@@ -43,7 +43,7 @@ var directPath = function(req, res, next){
   var namespace = config.get('namespace');
   var podIp = req.params[0];
   var filePath = req.params[1] || '';
-  var pod_host = "http://"+podIp;
+  var pod_host = "http://"+podIp+":8080";
   req.url = filePath;
   proxy.web(req, res, { target: pod_host });
 };
