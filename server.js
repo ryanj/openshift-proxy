@@ -92,13 +92,13 @@ var server = http.createServer(function(req, res) {
             podCache.set(cacheKey, containerUrl);
 	    //revProxy.register(cacheKey, containerUrl);
 	    //proxy_request(proxy, req, res, { target: revProxyUrl });
-	    proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: false, ignorePath: false });
+	    proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: true });
           }
         });
       } else {
         console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
 	//proxy_request(proxy, req, res, { target: revProxyUrl });
-	proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: false, ignorePath: false });
+	proxy_request(proxy, req, res, { target: containerUrl + newPath, prependPath: true, ignorePath: true });
       }
 
     } else {
