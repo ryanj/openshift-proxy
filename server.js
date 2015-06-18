@@ -48,6 +48,7 @@ var server = http.createServer(function(req, res) {
   if (req.url.indexOf('/api/v1beta3/namespaces/') == 0) {
     proxy_request(proxy, req, res, { target: config.openshiftServer });
   } else {
+    console.log("headers: ", req.headers)
     var parsed = url.parse(req.url);
     console.log("parsed: ", parsed)
     var results = parsed.pathname.match(re);
