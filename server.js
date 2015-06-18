@@ -24,11 +24,13 @@ var LRU = require("lru-cache")
 
   proxy.on('error', function (error, req, res) {
     console.log('proxy error', error);
-    if (!res.headersSent) {
-      res.writeHead(500, { 'content-type': 'application/json' });
+    if (res) {
+      if (!res.headersSent) {
+        res.writeHead(500, { 'content-type': 'application/json' });
+      }
+      var json = { error: 'proxy_error', reason: error.message };
+      res.end(JSON.stringify(json));
     }
-    var json = { error: 'proxy_error', reason: error.message };
-    res.end(JSON.stringify(json));
   });
 
   var config = {
