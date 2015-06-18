@@ -67,12 +67,14 @@ var parsePod = function(update) {
   } else {
     var podName = update.object.metadata.name;
     if (update.type === 'DELETED') {
+      console.log('Removing',podName,'from the cache');
       delete podCache[podName];
     } else if (update.object.status.podIP && update.object.spec.containers[0].ports && update.object.spec.containers[0].ports.length > 0 && update.object.spec.containers[0].ports[0].containerPort) {
       var podIp = update.object.status.podIP;
       var containerPort = update.object.spec.containers[0].ports[0].containerPort;
       var containerUrl = "http://" + podIp + ":" + containerPort;
       if (podCache[podName] != containerUrl) {
+        console.log('Addind',podName,'to the cache');
         podCache[podName] = containerUrl;
       }
     }
@@ -141,9 +143,9 @@ var server = http.createServer(function(req, res) {
 
 });
 
-Rx.Observable.interval(10000).subscribe(function() {
-  console.log('podCache', podCache);
-})
+// Rx.Observable.interval(10000).subscribe(function() {
+//   console.log('podCache', podCache);
+// })
 
 console.log('listening on', config.hostname, ':', config.port)
 server.listen(config.port, config.hostname);
