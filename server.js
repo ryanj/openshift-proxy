@@ -69,13 +69,14 @@ var LRU = require("lru-cache")
         var pod = results[2];
         var resourceUrl = req.url.substring(results[0].length);
         var lastSlash = resourceUrl.lastIndexOf('/');
-        var newPath = resourceUrl;
+        var newPath = ''; //lastSlash === -1 ? '' : resourceUrl.substring(0, lastSlash);
         console.log("headers: ", req.headers)
         console.log("parsed: ", parsed)
         console.log("origPath: ", origPath)
         console.log("namespace: ", namespace)
         console.log("pod: ", pod)
         console.log("newPath: ", newPath)
+        req.url = resourceUrl;
         //var cacheKey = "http://" + req.headers.host + "/" + namespace + "/" + pod;
         var cacheKey = namespace + "/" + pod;
         containerUrl = podCache.get(cacheKey);
