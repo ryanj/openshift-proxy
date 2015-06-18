@@ -78,7 +78,7 @@ var LRU = require("lru-cache")
         containerUrl = podCache.get(cacheKey);
         if (!!containerUrl) {
           console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
-          proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, ignorePath: true });
+          proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, prependPath: false, ignorePath: true });
         } else {
           var client = restify.createJsonClient({
             url: config.openshiftServer,
@@ -101,7 +101,7 @@ var LRU = require("lru-cache")
               podCache.set(cacheKey, containerUrl);
               //revProxy.register(cacheKey, containerUrl);
               //proxy_request(proxy, req, res, { target: revProxyUrl });
-              proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, ignorePath: true });
+              proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, prependPath: false, ignorePath: true });
             }
           });
         }
