@@ -67,7 +67,9 @@ var LRU = require("lru-cache")
         var origPath = req.url.substring(results[0].length);
         var namespace = results[1];
         var pod = results[2];
-        var newPath = results.slice(3).join('/')
+        var resourceUrl = req.url.substring(results[0].length);
+        var lastSlash = resourceUrl.lastIndexOf('/');
+        var newPath = lastSlash = -1 ? '' : resourceUrl.substring(0, lastSlash);
         console.log("headers: ", req.headers)
         console.log("parsed: ", parsed)
         console.log("origPath: ", origPath)
