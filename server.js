@@ -36,6 +36,7 @@ var LRU = require("lru-cache")
   , port: process.env.OPENSHIFT_NODEJS_PORT || 8080
   , hostname: process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
   , token: process.env.ACCESS_TOKEN || ''
+  , namespace: process.env.NAMESPACE || 'test3'
   };
 
   var re = /^\/([a-z0-9\-]*)\/([a-z0-9\-]*)/;
@@ -45,10 +46,14 @@ var LRU = require("lru-cache")
   }
 
   var server = http.createServer(function(req, res) {
+    var containerUrl;
     console.log("*******************************************************************************");
     console.log("req.url", req.url);
     if (req.url.indexOf('/api/v1beta3/namespaces/') == 0) {
       proxy_request(proxy, req, res, { target: config.openshiftServer });
+    } else if (req.url.indexOf('/'+config.namespace) !== 0) {
+        containerUrl = podCache.get('test3/sketchpod-1-k8wj0');
+        proxy_request(proxy, req, res, { target: containerUrl, prependPath: true, ignorePath: true });
     } else {
       console.log("headers: ", req.headers)
       var parsed = url.parse(req.url);
@@ -65,7 +70,7 @@ var LRU = require("lru-cache")
       if (results) {
         //var cacheKey = "http://" + req.headers.host + "/" + namespace + "/" + pod;
         var cacheKey = namespace + "/" + pod;
-        var containerUrl = podCache.get(cacheKey);
+        containerUrl = podCache.get(cacheKey);
         if (!containerUrl) {
           var client = restify.createJsonClient({
             url: config.openshiftServer,
