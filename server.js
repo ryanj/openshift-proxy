@@ -32,6 +32,8 @@ var config = {
 , namespace: process.env.NAMESPACE || 'test3'
 };
 
+console.log('config', config);
+
 var listWatchConfig = {
   name: 'Proxy Listwatch'
 , listOptions: {
@@ -139,8 +141,8 @@ var server = http.createServer(function(req, res) {
 
 });
 
-Rx.Observable.interval(1000).subscribe(function() {
-  console.log('podCache.length', podCache.length);
+Rx.Observable.interval(10000).subscribe(function() {
+  console.log('podCache', podCache);
 })
 
 console.log('listening on', config.hostname, ':', config.port)
