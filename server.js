@@ -52,10 +52,9 @@ var LRU = require("lru-cache")
   var server = http.createServer(function(req, res) {
     var containerUrl;
     console.log("*******************************************************************************");
-    console.log("req.url", req.url);
+    // console.log("req.url", req.url);
     if (req.url.indexOf('/'+config.namespace) !== 0) {
-      containerUrl = podCache.get('test3/sketchpod-1-k8wj0');
-      proxy_request(proxy, req, res, { target: containerUrl });
+      console.log('Ignoring request:', req.url)
     } else {
       var parsed = url.parse(req.url);
       var results = parsed.pathname.match(re);
@@ -66,19 +65,19 @@ var LRU = require("lru-cache")
         var resourceUrl = req.url.substring(results[0].length);
         var lastSlash = resourceUrl.lastIndexOf('/');
         var newPath = ''; //lastSlash === -1 ? '' : resourceUrl.substring(0, lastSlash);
-        console.log("headers: ", req.headers)
-        console.log("parsed: ", parsed)
-        console.log("origPath: ", origPath)
-        console.log("namespace: ", namespace)
-        console.log("pod: ", pod)
-        console.log("newPath: ", newPath)
-        // req.url = resourceUrl;
+        // console.log("headers: ", req.headers)
+        // console.log("parsed: ", parsed)
+        // console.log("origPath: ", origPath)
+        // console.log("namespace: ", namespace)
+        // console.log("pod: ", pod)
+        // console.log("newPath: ", newPath)
+        req.url = resourceUrl;
         //var cacheKey = "http://" + req.headers.host + "/" + namespace + "/" + pod;
         var cacheKey = namespace + "/" + pod;
         containerUrl = podCache.get(cacheKey);
         if (!!containerUrl) {
-          console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
-          proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, prependPath: false, ignorePath: true });
+          // console.log("Using cached value: " + containerUrl + " for: " + cacheKey);
+          proxy_request(proxy, req, res, { target: containerUrl, prependPath: true, ignorePath: false });
         } else {
           var client = restify.createJsonClient({
             url: config.openshiftServer,
@@ -89,7 +88,7 @@ var LRU = require("lru-cache")
           });
           var podPath = "/api/v1beta3/namespaces/" + namespace + "/pods/" + pod;
           var podUrl = config.openshiftServer + podPath
-          console.log("podUrl: ", podUrl)
+          // console.log("podUrl: ", podUrl)
           client.get(podUrl, function(err, c_req, c_res, obj) {
             if (err instanceof Error) {
               console.log("Error querying api: ", err);
@@ -97,11 +96,11 @@ var LRU = require("lru-cache")
               var podIp = obj.status.podIP;
               var containerPort = obj.spec.containers[0].ports[0].containerPort;
               var containerUrl = "http://" + podIp + ":" + containerPort;
-              console.log("Caching value: " + containerUrl + " for: " + cacheKey);
+              // console.log("Caching value: " + containerUrl + " for: " + cacheKey);
               podCache.set(cacheKey, containerUrl);
               //revProxy.register(cacheKey, containerUrl);
               //proxy_request(proxy, req, res, { target: revProxyUrl });
-              proxy_request(proxy, req, res, { target: containerUrl + resourceUrl, prependPath: false, ignorePath: true });
+              proxy_request(proxy, req, res, { target: containerUrl, prependPath: true, ignorePath: false });
             }
           });
         }
