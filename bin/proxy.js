@@ -2,6 +2,7 @@ var httpProxy = require('http-proxy');
 var proxy     = httpProxy.createProxyServer({secure: false});
 var url       = require('url')
 var config    = require('./config')
+var Netmask   = require('netmask').Netmask
 //var LRU       = require("lru-cache")
 //  , options   = { 
 //      max: 1050
@@ -53,8 +54,14 @@ var directPath  = function(req, res, next){
   if( qs && qs !== ''){
     req.url += qs;
   }
-  proxy.web(req, res, { target: pod_host });
+  if(config.get('allowed_subnet')){
+    var block = new Netmask(config.get('allowed_subnet'));
+    if( !block.contains(podIp) ){
+      console.log('PROXY request FILTERED - req.url', pod_host+req.url);
+    }
+  }
   console.log('PROXY req.url', pod_host+req.url);
+  proxy.web(req, res, { target: pod_host });
 };
 
 exports = module.exports = {
