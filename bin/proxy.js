@@ -1,5 +1,6 @@
 var httpProxy = require('http-proxy');
 var proxy     = httpProxy.createProxyServer({secure: false});
+var url       = require('url')
 var config    = require('./config')
 //var LRU       = require("lru-cache")
 //  , options   = { 
@@ -30,21 +31,29 @@ function proxy_request(proxy, req, res, options){   console.log('PROXY req.url',
 
 var path = function(req, res, next) {
   var namespace = req.params[0] || config.get('namespace');
-  var podId = req.params[1];
-  var filePath = req.params[2] || '';
-  var pod_host = "https://"+config.get('openshift_server');
-  req.url = '/api/v1beta3/namespaces/'+namespace+'/pods/'+ podId +'/proxy/'+filePath;
+  var podId     = req.params[1];
+  var filePath  = req.params[2] || '';
+  var pod_host  = "https://"+config.get('openshift_server');
+  var qs        = url.parse(req.url).search
+  req.url = '/api/v1beta3/namespaces/'+namespace+'/pods/'+ podId +'/proxy/'+filePath
+  if( qs && qs !== ''){
+    req.url += qs;
+  }
   req.headers.authorization = 'Bearer ' + config.get('oauth_token');
   //console.log("namespace, podid, filepath: " + namespace +" "+podId+" "+filePath)
   proxy.web(req, res, { target: pod_host });
 };
 
-var directPath = function(req, res, next){
+var directPath  = function(req, res, next){
   var namespace = config.get('namespace');
-  var podIp = req.params[0];
-  var filePath = req.params[1] || '';
-  var pod_host = "http://"+podIp+":8080";
+  var podIp     = req.params[0];
+  var filePath  = req.params[1] || '';
+  var pod_host  = "http://"+podIp+":8080";
+  var qs        = url.parse(req.url).search
   req.url = filePath;
+  if( qs && qs !== ''){
+    req.url += qs;
+  }
   proxy.web(req, res, { target: pod_host });
 };
 
