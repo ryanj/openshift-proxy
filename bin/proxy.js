@@ -16,18 +16,16 @@ proxy.on('close', function (req, socket, head) {
 });
 proxy.on('error',  function (error, req, res) {
   console.log('proxy error', error);
-  if (!res.headersSent) {
-    res.writeHead(500, { 'content-type': 'application/json' });
-  }
+  console.log('proxy req', req);
+  console.log('proxy res', res);
   var json = { error: 'proxy_error', reason: error.message };
-  res.end(JSON.stringify(json));
+  if(res){
+    if (!res.headersSent) {
+      res.writeHead(500, { 'content-type': 'application/json' });
+    }
+    res.end(JSON.stringify(json));
+  }
 });
-
-function proxy_request(proxy, req, res, options){   console.log('PROXY req.url', req.url);
-  console.log('PROXY req.url', req.url);
-  console.log('PROXY options.target', options.target);
-  proxy.web(req, res, options);
-}
 
 var path = function(req, res, next) {
   var namespace = req.params[0] || config.get('namespace');
@@ -42,6 +40,7 @@ var path = function(req, res, next) {
   req.headers.authorization = 'Bearer ' + config.get('oauth_token');
   //console.log("namespace, podid, filepath: " + namespace +" "+podId+" "+filePath)
   proxy.web(req, res, { target: pod_host });
+  console.log('PROXY req.url', pod_host+req.url);
 };
 
 var directPath  = function(req, res, next){
@@ -55,6 +54,7 @@ var directPath  = function(req, res, next){
     req.url += qs;
   }
   proxy.web(req, res, { target: pod_host });
+  console.log('PROXY req.url', pod_host+req.url);
 };
 
 exports = module.exports = {
